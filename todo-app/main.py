@@ -2,7 +2,7 @@ from fastapi import FastAPI
 import uvicorn
 from sqlalchemy import text
 from db.database import engine
-
+from db.database import Base
 
 app = FastAPI()
 
@@ -18,6 +18,8 @@ def test_db_connection():
             result = conn.execute(text("SELECT 1"))
             if result.scalar() == 1:
                 print("Database connected successfully!")
+            Base.metadata.create_all(bind=engine)
+            print("Tables created if not exist.")
     except Exception as e:
         print("Database connection failed:", e)
 
