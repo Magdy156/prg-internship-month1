@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from contextlib import asynccontextmanager
 from sqlalchemy import text
 from db.database import engine, Base
-from routes import user_router
+from routes import user_router, todo_router, todoitem_router
 import uvicorn
 
 @asynccontextmanager
@@ -23,7 +23,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+# Routers
 app.include_router(user_router)
+app.include_router(todo_router)
+app.include_router(todoitem_router)
 
 @app.get('/')
 def root():
