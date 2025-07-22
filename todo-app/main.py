@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from contextlib import asynccontextmanager
 from sqlalchemy import text
 from db.database import engine, Base
+from routes import user_router
 import uvicorn
 
 @asynccontextmanager
@@ -21,6 +22,8 @@ async def lifespan(app: FastAPI):
     print("Application shutting down")
 
 app = FastAPI(lifespan=lifespan)
+
+app.include_router(user_router)
 
 @app.get('/')
 def root():
