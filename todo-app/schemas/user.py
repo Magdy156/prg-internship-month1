@@ -9,6 +9,10 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     pass
 
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
 class UserResponse(UserBase):
     id: int
     created_at: datetime
