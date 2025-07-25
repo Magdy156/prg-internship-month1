@@ -1,24 +1,24 @@
 from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
-from models.todoitem import Priority
+from enum import Enum
 
-class TodoItemBase(BaseModel):
+class Priority(str, Enum):
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+
+class TodoItemCreate(BaseModel):
     title: str
     description: Optional[str] = None
-    completed: bool = False
+    completed: Optional[bool] = False
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     due_date: Optional[datetime] = None
-    priority: Priority = Priority.LOW
+    priority: Optional[Priority] = None
     category: Optional[str] = None
     todo_id: int
 
-class TodoItemCreate(TodoItemBase):
-    pass
-
-class TodoItemResponse(TodoItemBase):
+class TodoItemResponse(TodoItemCreate):
     id: int
-    created_at: datetime
-    updated_at: datetime
-
-    class Config:
-        from_attributes = True
+    todo_id: int

@@ -1,24 +1,26 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Enum
-from datetime import datetime, timezone
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, Enum
+from sqlalchemy.orm import relationship
 from db.database import Base
-import enum
+from datetime import datetime
+from enum import Enum as PyEnum
 
-
-class Priority(enum.Enum):
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
+class Priority(PyEnum):
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
 
 class TodoItem(Base):
     __tablename__ = "todoitems"
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
-    description = Column(String, nullable=True)
+    description = Column(String)
     completed = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
-    due_date = Column(DateTime, nullable=True)
-    priority = Column(Enum(Priority), default=Priority.LOW)
-    category = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow)
+    due_date = Column(DateTime)
+    priority = Column(Enum(Priority, name="priority", create_type=True))
+    category = Column(String)
     todo_id = Column(Integer, ForeignKey("todos.id"), nullable=False, index=True)
+
+    todo = relationship("Todo")

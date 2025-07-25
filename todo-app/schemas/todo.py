@@ -1,17 +1,12 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 
-class TodoBase(BaseModel):
+class TodoCreate(BaseModel):
     title: str
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
-class TodoCreate(TodoBase):
-    pass
-
-class TodoResponse(TodoBase):
+class TodoResponse(TodoCreate):
     id: int
-    created_at: datetime
-    updated_at: datetime
     user_id: int
-
-    class Config:
-        from_attributes = True
