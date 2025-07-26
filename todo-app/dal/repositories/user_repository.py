@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from models.user import User
 from schemas.user import UserCreate
-from fastapi import HTTPException, status
+from utils.exceptions import UserNotFoundException
 
 class UserRepository:
     def __init__(self, db: Session):
@@ -10,13 +10,13 @@ class UserRepository:
     def get_user_by_id(self, user_id: int) -> User:
         user = self.db.query(User).filter(User.id == user_id).first()
         if user is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+            raise UserNotFoundException()
         return user
 
     def get_user_by_username(self, username: str) -> User:
         user = self.db.query(User).filter(User.username == username).first()
         if user is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+            raise UserNotFoundException()
         return user
 
     def create_user(self, user: UserCreate) -> User:

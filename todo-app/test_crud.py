@@ -4,7 +4,7 @@ from datetime import datetime
 BASE_URL = "http://127.0.0.1:8000"
 
 def test_crud():
-    # User CRUD
+    # User CRUD (Existing successful tests)
     print("Testing User CRUD...")
     user_data = {
         "username": f"another_{int(datetime.now().timestamp())}",
@@ -136,7 +136,50 @@ def test_crud():
         print(f"Test failed: Delete TodoList failed: {response.text}")
         raise Exception("Delete TodoList failed")
 
-    print("All CRUD tests passed successfully!")
+    # Exception Tests
+    print("\nTesting Exception Handling...")
+
+    # Test UserNotFoundException (non-existent user)
+    print("Testing read non-existent user...")
+    non_existent_user_id = 9999
+    response = requests.get(f"{BASE_URL}/users/{non_existent_user_id}", headers=headers)
+    print(f"Read Non-Existent User - Status Code: {response.status_code}")
+    print(f"Read Non-Existent User - Response: {response.text}")
+    if response.status_code != 404 or response.json().get("detail") != "User not found":
+        print(f"Test failed: Expected 404 with 'User not found', got {response.status_code}: {response.text}")
+        raise Exception("UserNotFoundException test failed")
+
+    # Test InvalidCredentialsException (wrong password)
+    print("Testing login with incorrect password...")
+    invalid_login_data = {"username": update_user_data["username"], "password": "wrongpassword"}  # Use updated username
+    response = requests.post(f"{BASE_URL}/auth/login", data=invalid_login_data)
+    print(f"Login Invalid Password - Status Code: {response.status_code}")
+    print(f"Login Invalid Password - Response: {response.text}")
+    if response.status_code != 401 or response.json().get("detail") != "Incorrect username or password":
+        print(f"Test failed: Expected 401 with 'Incorrect username or password', got {response.status_code}: {response.text}")
+        raise Exception("InvalidCredentialsException test failed")
+
+    # Test UserNotFoundException (non-existent username)
+    print("Testing login with non-existent username...")
+    invalid_login_data = {"username": "nonexistentuser123", "password": "testpassword"}
+    response = requests.post(f"{BASE_URL}/auth/login", data=invalid_login_data)
+    print(f"Login Non-Existent Username - Status Code: {response.status_code}")
+    print(f"Login Non-Existent Username - Response: {response.text}")
+    if response.status_code != 404 or response.json().get("detail") != "User not found":
+        print(f"Test failed: Expected 404 with 'User not found', got {response.status_code}: {response.text}")
+        raise Exception("UserNotFoundException test failed (login)")
+
+    # Test JWTDecodeException (invalid token)
+    print("Testing invalid JWT token...")
+    invalid_headers = {"Authorization": "Bearer invalid.token.here"}
+    response = requests.get(f"{BASE_URL}/users/{created_user['id']}", headers=invalid_headers)
+    print(f"Read User with Invalid Token - Status Code: {response.status_code}")
+    print(f"Read User with Invalid Token - Response: {response.text}")
+    if response.status_code != 401 or response.json().get("detail") != "Could not validate credentials":
+        print(f"Test failed: Expected 401 with 'Could not validate credentials', got {response.status_code}: {response.text}")
+        raise Exception("JWTDecodeException test failed")
+
+    print("All CRUD and exception tests passed successfully!")
 
 if __name__ == "__main__":
     try:
