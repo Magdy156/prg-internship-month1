@@ -8,17 +8,10 @@ class TodoItemRepository:
         self.db = db
 
     def create_todo_item(self, todo_item: TodoItemCreate, todolist_id: int) -> TodoItem:
-        db_todo_item = TodoItem(
-            title=todo_item.title,
-            description=todo_item.description,
-            completed=todo_item.completed,
-            created_at=todo_item.created_at if hasattr(todo_item, 'created_at') else None,
-            updated_at=todo_item.updated_at if hasattr(todo_item, 'updated_at') else None,
-            due_date=todo_item.due_date,
-            priority=todo_item.priority.value if todo_item.priority else None,
-            category=todo_item.category,
-            todolist_id=todolist_id
-        )
+        data = todo_item.model_dump()
+        data['priority'] = data['priority'].value if data['priority'] else None
+        data['todolist_id'] = todolist_id
+        db_todo_item = TodoItem(**data)
         self.db.add(db_todo_item)
         self.db.commit()
         self.db.refresh(db_todo_item)
@@ -32,12 +25,11 @@ class TodoItemRepository:
 
     def update_todo_item(self, todo_item_id: int, todo_item: TodoItemCreate) -> TodoItem:
         db_todo_item = self.get_todo_item(todo_item_id)
-        db_todo_item.title = todo_item.title
-        db_todo_item.description = todo_item.description
-        db_todo_item.completed = todo_item.completed
-        db_todo_item.due_date = todo_item.due_date
-        db_todo_item.priority = todo_item.priority.value if todo_item.priority else None
-        db_todo_item.category = todo_item.category
+        update_data = todo_item.model_dump(exclude_unset=True)
+        if 'priority' in update_data:
+            update_data['priority'] = update_data['priority'].value if update_data['priority'] else None
+        for key, value in update_data.items():
+            setattr(db_todo_item, key, value)
         self.db.commit()
         self.db.refresh(db_todo_item)
         return db_todo_item

@@ -7,17 +7,14 @@ class TodoListRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_todo(self, todo: TodoListCreate, user_id: int) -> TodoList:
-        db_todo = TodoList(
-            title=todo.title,
-            created_at=todo.created_at if hasattr(todo, 'created_at') else None,
-            updated_at=todo.updated_at if hasattr(todo, 'updated_at') else None,
-            user_id=user_id
-        )
-        self.db.add(db_todo)
+    def create_todo(self, todolist: TodoListCreate, user_id: int) -> TodoList:
+        data = todolist.model_dump()
+        data['user_id'] = user_id
+        db_todolist = TodoList(**data)
+        self.db.add(db_todolist)
         self.db.commit()
-        self.db.refresh(db_todo)
-        return db_todo
+        self.db.refresh(db_todolist)
+        return db_todolist
 
     def get_todo(self, todo_id: int) -> TodoList:
         todo = self.db.query(TodoList).filter(TodoList.id == todo_id).first()
@@ -25,13 +22,14 @@ class TodoListRepository:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Todo not found")
         return todo
 
-    def update_todo(self, todo_id: int, todo: TodoListCreate) -> TodoList:
-        db_todo = self.get_todo(todo_id)
-        db_todo.title = todo.title
-        db_todo.updated_at = todo.updated_at if hasattr(todo, 'updated_at') else None
+    def update_todo(self, todo_id: int, todolist: TodoListCreate) -> TodoList:
+        db_todolist = self.get_todo(todo_id)
+        update_data = todolist.model_dump(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(db_todolist, key, value)
         self.db.commit()
-        self.db.refresh(db_todo)
-        return db_todo
+        self.db.refresh(db_todolist)
+        return db_todolist
 
     def delete_todo(self, todo_id: int):
         db_todo = self.get_todo(todo_id)

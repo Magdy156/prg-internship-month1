@@ -20,12 +20,7 @@ class UserRepository:
         return user
 
     def create_user(self, user: UserCreate) -> User:
-        db_user = User(
-            username=user.username,
-            email=user.email,
-            password=user.password,
-            created_at=user.created_at if hasattr(user, 'created_at') else None
-        )
+        db_user = User(**user.model_dump())
         self.db.add(db_user)
         self.db.commit()
         self.db.refresh(db_user)
@@ -33,9 +28,9 @@ class UserRepository:
 
     def update_user(self, user_id: int, user: UserCreate) -> User:
         db_user = self.get_user_by_id(user_id)
-        db_user.username = user.username
-        db_user.email = user.email
-        db_user.password = user.password
+        update_data = user.model_dump(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(db_user, key, value)
         self.db.commit()
         self.db.refresh(db_user)
         return db_user

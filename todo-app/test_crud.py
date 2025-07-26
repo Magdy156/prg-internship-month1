@@ -127,6 +127,14 @@ def test_crud():
     if response.status_code != 204:
         print(f"Test failed: Delete TodoItem failed: {response.text}")
         raise Exception("Delete TodoItem failed")
+    
+    print(f"Deleting todolist with ID {created_todolist['id']}")
+    response = requests.delete(f"{BASE_URL}/todolists/{created_todolist['id']}", headers=headers)
+    print(f"Delete TodoList - Status Code: {response.status_code}")
+    print(f"Delete TodoList - Response: {response.text}")
+    if response.status_code != 204:
+        print(f"Test failed: Delete TodoList failed: {response.text}")
+        raise Exception("Delete TodoList failed")
 
     print("All CRUD tests passed successfully!")
 

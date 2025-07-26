@@ -1,4 +1,4 @@
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from dal.repositories.todolist_repository import TodoListRepository
 from schemas.todolist import TodoListCreate, TodoListResponse
@@ -19,5 +19,6 @@ class TodoListService:
         return self.todo_repo.update_todo(todo_id, todo)
 
     def delete_todo(self, todo_id: int):
+        if not self.todo_repo.get_todo(todo_id):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="TodoList not found")
         self.todo_repo.delete_todo(todo_id)
-        return {"detail": "Todo deleted"}
