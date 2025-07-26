@@ -12,4 +12,4 @@ class User(Base):
     password = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    todos = relationship("Todo", back_populates="user")
+    todolists = relationship("TodoList", back_populates="user")

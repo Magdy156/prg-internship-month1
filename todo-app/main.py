@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from sqlalchemy import text
 from db.database import engine, Base
-from routes import auth_router, user_router, todo_router, todoitem_router
+from routes import auth_router, user_router, todolist_router, todoitem_router
 import uvicorn
 
 @asynccontextmanager
@@ -29,7 +29,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(auth_router)
 app.include_router(user_router)
-app.include_router(todo_router)
+app.include_router(todolist_router)
 app.include_router(todoitem_router)
 
 @app.get('/')

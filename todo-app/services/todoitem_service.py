@@ -9,8 +9,8 @@ class TodoItemService:
     def __init__(self, db: Session = Depends(get_db)):
         self.todoitem_repo = TodoItemRepository(db)
 
-    def create_todo_item(self, todo_item: TodoItemCreate, todo_id: int) -> TodoItem:
-        return self.todoitem_repo.create_todo_item(todo_item, todo_id)
+    def create_todo_item(self, todo_item: TodoItemCreate, todolist_id: int) -> TodoItem:
+        return self.todoitem_repo.create_todo_item(todo_item, todolist_id)
 
     def get_todo_item(self, todo_item_id: int) -> TodoItem:
         return self.todoitem_repo.get_todo_item(todo_item_id)

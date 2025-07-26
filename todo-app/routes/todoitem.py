@@ -8,7 +8,7 @@ router = APIRouter(prefix="/todoitems", tags=["todoitems"])
 
 @router.post("/", response_model=TodoItemResponse)
 def create_todo_item(todo_item: TodoItemCreate, current_user: User = Depends(get_current_user), todoitem_service: TodoItemService = Depends()):
-    return todoitem_service.create_todo_item(todo_item, todo_item.todo_id)
+    return todoitem_service.create_todo_item(todo_item, todo_item.todolist_id)
 
 @router.get("/{todo_item_id}", response_model=TodoItemResponse)
 def read_todo_item(todo_item_id: int, current_user: User = Depends(get_current_user), todoitem_service: TodoItemService = Depends()):

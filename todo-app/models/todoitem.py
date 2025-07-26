@@ -21,6 +21,6 @@ class TodoItem(Base):
     due_date = Column(DateTime)
     priority = Column(Enum(Priority, name="priority", create_type=True))
     category = Column(String)
-    todo_id = Column(Integer, ForeignKey("todos.id"), nullable=False, index=True)
+    todolist_id = Column(Integer, ForeignKey("todolists.id"), nullable=False, index=True)
 
-    todo = relationship("Todo")
+    todolist = relationship("TodoList")

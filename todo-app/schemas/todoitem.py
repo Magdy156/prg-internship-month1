@@ -17,8 +17,8 @@ class TodoItemCreate(BaseModel):
     due_date: Optional[datetime] = None
     priority: Optional[Priority] = None
     category: Optional[str] = None
-    todo_id: int
+    todolist_id: int
 
 class TodoItemResponse(TodoItemCreate):
     id: int
-    todo_id: int
+    todolist_id: int

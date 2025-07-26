@@ -54,27 +54,27 @@ def test_crud():
     headers = {"Authorization": f"Bearer {token}"}
     print(f"New token after update: {token}")
 
-    # Todo CRUD
-    print("\nTesting Todo CRUD...")
-    todo_data = {"title": "Test Todo"}
-    response = requests.post(f"{BASE_URL}/todos/", json=todo_data, headers=headers)
-    print(f"Create Todo - Status Code: {response.status_code}")
-    print(f"Create Todo - Response: {response.text}")
-    created_todo = response.json()
-    print(f"Created Todo: {created_todo}")
+    # TodoList CRUD
+    print("\nTesting TodoList CRUD...")
+    todolist_data = {"title": "Test TodoList"}
+    response = requests.post(f"{BASE_URL}/todolists/", json=todolist_data, headers=headers)
+    print(f"Create TodoList - Status Code: {response.status_code}")
+    print(f"Create TodoList - Response: {response.text}")
+    created_todolist = response.json()
+    print(f"Created TodoList: {created_todolist}")
 
-    print(f"Sending headers for todo read: {headers}")
-    response = requests.get(f"{BASE_URL}/todos/{created_todo['id']}", headers=headers)
-    print(f"Read Todo - Status Code: {response.status_code}")
-    print(f"Read Todo - Response: {response.text}")
-    print(f"Read Todo: {response.json()}")
+    print(f"Sending headers for todolist read: {headers}")
+    response = requests.get(f"{BASE_URL}/todolists/{created_todolist['id']}", headers=headers)
+    print(f"Read TodoList - Status Code: {response.status_code}")
+    print(f"Read TodoList - Response: {response.text}")
+    print(f"Read TodoList: {response.json()}")
 
-    update_todo_data = {"title": "Updated Todo"}
-    print(f"Sending headers for todo update: {headers}")
-    response = requests.put(f"{BASE_URL}/todos/{created_todo['id']}", json=update_todo_data, headers=headers)
-    print(f"Update Todo - Status Code: {response.status_code}")
-    print(f"Update Todo - Response: {response.text}")
-    print(f"Updated Todo: {response.json()}")
+    update_todolist_data = {"title": "Updated TodoList"}
+    print(f"Sending headers for todolist update: {headers}")
+    response = requests.put(f"{BASE_URL}/todolists/{created_todolist['id']}", json=update_todolist_data, headers=headers)
+    print(f"Update TodoList - Status Code: {response.status_code}")
+    print(f"Update TodoList - Response: {response.text}")
+    print(f"Updated TodoList: {response.json()}")
 
     # TodoItem CRUD
     print("\nTesting TodoItem CRUD...")
@@ -83,7 +83,7 @@ def test_crud():
         "description": "Test Description",
         "completed": False,
         "priority": "MEDIUM",
-        "todo_id": created_todo["id"]
+        "todolist_id": created_todolist["id"]
     }
     print(f"Sending headers for todoitem create: {headers}")
     response = requests.post(f"{BASE_URL}/todoitems/", json=todo_item_data, headers=headers)
@@ -103,13 +103,13 @@ def test_crud():
         print(f"Test failed: Read TodoItem failed: {response.text}")
         raise Exception("Read TodoItem failed")
     print(f"Read TodoItem: {response.json()}")
-    
+
     update_todo_item_data = {
         "title": "Updated Item",
         "description": "Updated Description",
         "completed": True,
         "priority": "HIGH",
-        "todo_id": created_todo["id"]
+        "todolist_id": created_todolist["id"]
     }
     print(f"Sending headers for todoitem update: {headers}")
     response = requests.put(f"{BASE_URL}/todoitems/{created_todo_item['id']}", json=update_todo_item_data, headers=headers)
@@ -119,7 +119,7 @@ def test_crud():
         print(f"Test failed: Update TodoItem failed: {response.text}")
         raise Exception("Update TodoItem failed")
     print(f"Updated TodoItem: {response.json()}")
-    
+
     print(f"Sending headers for todoitem delete: {headers}")
     response = requests.delete(f"{BASE_URL}/todoitems/{created_todo_item['id']}", headers=headers)
     print(f"Delete TodoItem - Status Code: {response.status_code}")

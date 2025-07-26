@@ -7,7 +7,7 @@ class TodoItemRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_todo_item(self, todo_item: TodoItemCreate, todo_id: int) -> TodoItem:
+    def create_todo_item(self, todo_item: TodoItemCreate, todolist_id: int) -> TodoItem:
         db_todo_item = TodoItem(
             title=todo_item.title,
             description=todo_item.description,
@@ -17,7 +17,7 @@ class TodoItemRepository:
             due_date=todo_item.due_date,
             priority=todo_item.priority.value if todo_item.priority else None,
             category=todo_item.category,
-            todo_id=todo_id
+            todolist_id=todolist_id
         )
         self.db.add(db_todo_item)
         self.db.commit()
