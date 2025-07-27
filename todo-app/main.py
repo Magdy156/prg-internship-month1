@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from sqlalchemy import text
 from db.database import engine, Base
 from routes import auth_router, user_router, todolist_router, todoitem_router
-from utils.exceptions import UserNotFoundException, InvalidCredentialsException, JWTDecodeException
+from utils.exceptions import UserNotFoundException, InvalidCredentialsException, JWTDecodeException, UsernameExistsException, TodoListNotFoundException, TodoItemNotFoundException
 import uvicorn
 
 @asynccontextmanager
@@ -29,7 +29,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-# Global exception handlers
 @app.exception_handler(UserNotFoundException)
 async def user_not_found_exception_handler(request, exc: UserNotFoundException):
     print(f"UserNotFoundException: {exc.detail}")
@@ -54,6 +53,30 @@ async def jwt_decode_exception_handler(request, exc: JWTDecodeException):
         status_code=status.HTTP_401_UNAUTHORIZED,
         content={"detail": exc.detail},
         headers={"WWW-Authenticate": "Bearer"},
+    )
+
+@app.exception_handler(UsernameExistsException)
+async def username_exists_exception_handler(request, exc: UsernameExistsException):
+    print(f"UsernameExistsException: {exc.detail}")
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={"detail": exc.detail},
+    )
+
+@app.exception_handler(TodoListNotFoundException)
+async def todolist_not_found_exception_handler(request, exc: TodoListNotFoundException):
+    print(f"TodoListNotFoundException: {exc.detail}")
+    return JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND,
+        content={"detail": exc.detail},
+    )
+
+@app.exception_handler(TodoItemNotFoundException)
+async def todoitem_not_found_exception_handler(request, exc: TodoItemNotFoundException):
+    print(f"TodoItemNotFoundException: {exc.detail}")
+    return JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND,
+        content={"detail": exc.detail},
     )
 
 app.include_router(auth_router)

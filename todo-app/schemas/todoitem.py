@@ -19,6 +19,13 @@ class TodoItemCreate(BaseModel):
     category: Optional[str] = None
     todolist_id: int
 
+class TodoItemUpdate(TodoItemCreate):
+    pass
+
 class TodoItemResponse(TodoItemCreate):
     id: int
     todolist_id: int
+
+    class Config:
+        from_attributes = True
+        exclude = {"todolist"}

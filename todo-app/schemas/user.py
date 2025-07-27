@@ -9,6 +9,11 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     pass
 
+class UserUpdate(UserBase):
+    username: str | None = None  # Allow partial updates
+    email: str | None = None
+    password: str | None = None
+
 class UserLogin(BaseModel):
     username: str
     password: str
@@ -19,3 +24,4 @@ class UserResponse(UserBase):
 
     class Config:
         from_attributes = True
+        exclude = {"todolists"}  # Exclude the 'todolists' relationship

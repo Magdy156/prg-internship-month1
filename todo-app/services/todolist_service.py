@@ -1,24 +1,20 @@
-from fastapi import Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from dal.repositories.todolist_repository import TodoListRepository
+from fastapi import Depends
 from schemas.todolist import TodoListCreate, TodoListResponse
-from models.todolist import TodoList
-from db.database import get_db
+from dal.repositories.todolist_repository import TodoListRepository
+from utils.dependencies import get_todolist_repository
 
 class TodoListService:
-    def __init__(self, db: Session = Depends(get_db)):
-        self.todo_repo = TodoListRepository(db)
+    def __init__(self, todo_repo: TodoListRepository = Depends(get_todolist_repository)):
+        self.todo_repo = todo_repo
 
-    def create_todo(self, todo: TodoListCreate, user_id: int) -> TodoList:
+    def create_todo(self, todo: TodoListCreate, user_id: int) -> TodoListResponse:
         return self.todo_repo.create_todo(todo, user_id)
 
-    def get_todo(self, todo_id: int) -> TodoList:
+    def get_todo(self, todo_id: int) -> TodoListResponse:
         return self.todo_repo.get_todo(todo_id)
 
-    def update_todo(self, todo_id: int, todo: TodoListCreate) -> TodoList:
+    def update_todo(self, todo_id: int, todo: TodoListCreate) -> TodoListResponse:
         return self.todo_repo.update_todo(todo_id, todo)
 
     def delete_todo(self, todo_id: int):
-        if not self.todo_repo.get_todo(todo_id):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="TodoList not found")
         self.todo_repo.delete_todo(todo_id)
