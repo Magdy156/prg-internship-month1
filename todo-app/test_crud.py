@@ -48,6 +48,26 @@ def test_crud():
         headers = {"Authorization": f"Bearer {access_token}"}
         print(f"Access Token: {access_token[:10]}...")
 
+        # Test Validate Token
+        print("Testing validate token...")
+        response = requests.post(f"{BASE_URL}/auth/validate-token", headers=headers)
+        print(f"Validate Token - Status Code: {response.status_code}")
+        print(f"Validate Token - Response: {response.text}")
+        if response.status_code != 200 or response.json().get("username") != user_data["username"]:
+            print(f"Test failed: Validate Token failed: {response.text}")
+            raise Exception("Validate Token failed")
+        print(f"Validated User: {response.json()}")
+
+        # Test Invalid Token
+        print("Testing invalid token validation...")
+        invalid_headers = {"Authorization": "Bearer invalid.token.here"}
+        response = requests.post(f"{BASE_URL}/auth/validate-token", headers=invalid_headers)
+        print(f"Invalid Token - Status Code: {response.status_code}")
+        print(f"Invalid Token - Response: {response.text}")
+        if response.status_code != 401 or response.json().get("detail") != "Could not validate credentials":
+            print(f"Test failed: Expected 401 with 'Could not validate credentials', got {response.status_code}: {response.text}")
+            raise Exception("JWTDecodeException test failed (invalid token)")
+
         # Test Refresh Token
         print("Testing refresh token...")
         response = requests.post(f"{BASE_URL}/auth/refresh?refresh_token={refresh_token}")

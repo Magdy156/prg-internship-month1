@@ -5,6 +5,8 @@ from schemas.token import TokenResponse
 from services.auth_service import AuthService
 from utils.dependencies import get_user_service
 from services import UserService
+from utils.auth_utils import get_current_user
+from models.user import User
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -22,3 +24,7 @@ def login_user(form_data: OAuth2PasswordRequestForm = Depends(), user_service: U
 async def refresh_token(refresh_token: str, user_service: UserService = Depends(get_user_service)):
     auth_service = AuthService(user_service)
     return await auth_service.refresh_user_token(refresh_token)
+
+@router.post("/validate-token", response_model=UserResponse)
+async def validate_token(current_user: User = Depends(get_current_user)):
+    return UserResponse.model_validate(current_user)
