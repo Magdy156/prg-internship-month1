@@ -1,10 +1,17 @@
-from fastapi import FastAPI, HTTPException, status
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, status
 from contextlib import asynccontextmanager
 from sqlalchemy import text
 from db.database import engine, Base
 from routes import auth_router, user_router, todolist_router, todoitem_router
-from utils.exceptions import UserNotFoundException, InvalidCredentialsException, JWTDecodeException, UsernameExistsException, TodoListNotFoundException, TodoItemNotFoundException
+from utils.exceptions import (
+    UserNotFoundException,
+    InvalidCredentialsException,
+    JWTDecodeException,
+    UsernameExistsException,
+    TodoListNotFoundException,
+    TodoItemNotFoundException,
+)
+from utils.exception_handler import ExceptionHandler
 import uvicorn
 
 @asynccontextmanager
@@ -29,55 +36,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-@app.exception_handler(UserNotFoundException)
-async def user_not_found_exception_handler(request, exc: UserNotFoundException):
-    print(f"UserNotFoundException: {exc.detail}")
-    return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content={"detail": exc.detail},
-    )
-
-@app.exception_handler(InvalidCredentialsException)
-async def invalid_credentials_exception_handler(request, exc: InvalidCredentialsException):
-    print(f"InvalidCredentialsException: {exc.detail}")
-    return JSONResponse(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        content={"detail": exc.detail},
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
-@app.exception_handler(JWTDecodeException)
-async def jwt_decode_exception_handler(request, exc: JWTDecodeException):
-    print(f"JWTDecodeException: {exc.detail}")
-    return JSONResponse(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        content={"detail": exc.detail},
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
-@app.exception_handler(UsernameExistsException)
-async def username_exists_exception_handler(request, exc: UsernameExistsException):
-    print(f"UsernameExistsException: {exc.detail}")
-    return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        content={"detail": exc.detail},
-    )
-
-@app.exception_handler(TodoListNotFoundException)
-async def todolist_not_found_exception_handler(request, exc: TodoListNotFoundException):
-    print(f"TodoListNotFoundException: {exc.detail}")
-    return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content={"detail": exc.detail},
-    )
-
-@app.exception_handler(TodoItemNotFoundException)
-async def todoitem_not_found_exception_handler(request, exc: TodoItemNotFoundException):
-    print(f"TodoItemNotFoundException: {exc.detail}")
-    return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content={"detail": exc.detail},
-    )
+# Register the singleton exception handler for all custom exceptions
+exception_handler = ExceptionHandler()
+app.add_exception_handler(UserNotFoundException, exception_handler.handle)
+app.add_exception_handler(InvalidCredentialsException, exception_handler.handle)
+app.add_exception_handler(JWTDecodeException, exception_handler.handle)
+app.add_exception_handler(UsernameExistsException, exception_handler.handle)
+app.add_exception_handler(TodoListNotFoundException, exception_handler.handle)
+app.add_exception_handler(TodoItemNotFoundException, exception_handler.handle)
 
 app.include_router(auth_router)
 app.include_router(user_router)
