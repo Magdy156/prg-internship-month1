@@ -1,10 +1,11 @@
-import os
-from dotenv import load_dotenv
+from config.environment import EnvironmentSettings
 
-load_dotenv()
+# Instantiate settings
+settings = EnvironmentSettings()
 
-# JWT settings
-SECRET_KEY = os.getenv("SECRET_KEY", "Default")
-ALGORITHM = os.getenv("ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
-REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 7))
+
+DATABASE_URL = settings.DATABASE_URL
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+REFRESH_TOKEN_EXPIRE_DAYS = settings.REFRESH_TOKEN_EXPIRE_DAYS
