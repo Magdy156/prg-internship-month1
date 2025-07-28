@@ -1,5 +1,5 @@
 from fastapi.security import OAuth2PasswordRequestForm
-from schemas.user import UserCreate, UserResponse
+from schemas.user import UserCreateRequest, UserCreateResponse, UserReadResponse, UserLoginResponse
 from schemas.token import TokenResponse
 from services.user_service import UserService
 from utils.auth_utils import create_access_token, create_refresh_token
@@ -14,7 +14,7 @@ class AuthService:
     def __init__(self, user_service: UserService):
         self.user_service = user_service
 
-    def register_user(self, user: UserCreate) -> UserResponse:
+    def register_user(self, user: UserCreateRequest) -> UserCreateResponse:
         try:
             self.user_service.get_user_by_username(user.username)
             raise UsernameExistsException()
@@ -26,13 +26,13 @@ class AuthService:
                     raise UsernameExistsException()
                 raise
 
-    def login_user(self, form_data: OAuth2PasswordRequestForm) -> TokenResponse:
-        user = self.user_service.get_user_by_username(form_data.username)
+    def login_user(self, form_data: OAuth2PasswordRequestForm) -> UserLoginResponse:
+        user = self.user_service.get_user_by_username_for_auth(form_data.username)
         if not user or not verify_password(form_data.password, user.password):
             raise InvalidCredentialsException()
         access_token = create_access_token(data={"sub": user.username}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
         refresh_token = create_refresh_token(data={"sub": user.username})
-        return TokenResponse(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
+        return UserLoginResponse(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
 
     async def refresh_user_token(self, refresh_token: str) -> TokenResponse:
         try:

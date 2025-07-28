@@ -6,7 +6,6 @@ from utils.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, REF
 from utils.exceptions import JWTDecodeException
 from utils.dependencies import get_user_service
 from models.user import User
-from schemas.user import UserResponse
 from services.user_service import UserService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")

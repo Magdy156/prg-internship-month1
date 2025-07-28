@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from models.user import User
-from schemas.user import UserResponse
+from schemas.user import UserCreateResponse, UserUpdateResponse
 from utils.exceptions import UserNotFoundException
 from datetime import datetime, timezone
 
@@ -20,21 +20,21 @@ class UserRepository:
             raise UserNotFoundException()
         return user
 
-    def create_user(self, user_data: dict) -> UserResponse:
+    def create_user(self, user_data: dict) -> UserCreateResponse:
         db_user = User(**user_data, created_at=datetime.now(timezone.utc))
         self.db.add(db_user)
         self.db.commit()
         self.db.refresh(db_user)
-        return UserResponse.model_validate(db_user)
+        return UserCreateResponse.model_validate(db_user)
 
-    def update_user(self, user_id: int, user_data: dict) -> UserResponse:
+    def update_user(self, user_id: int, user_data: dict) -> UserUpdateResponse:
         db_user = self.db.query(User).filter(User.id == user_id).first()
         if db_user is None:
             raise UserNotFoundException()
         self.db.query(User).filter(User.id == user_id).update(user_data)
         self.db.commit()
         self.db.refresh(db_user)
-        return UserResponse.model_validate(db_user)
+        return UserUpdateResponse.model_validate(db_user)
 
     def delete_user(self, user_id: int):
         db_user = self.db.query(User).filter(User.id == user_id).first()

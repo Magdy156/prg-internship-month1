@@ -1,27 +1,54 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
+from schemas.token import TokenResponse
 
-class UserBase(BaseModel):
+class UserCreateRequest(BaseModel):
     username: str
     email: str
     password: str
 
-class UserCreate(UserBase):
-    pass
-
-class UserUpdate(UserBase):
-    username: str | None = None  # Allow partial updates
-    email: str | None = None
-    password: str | None = None
-
-class UserLogin(BaseModel):
-    username: str
-    password: str
-
-class UserResponse(UserBase):
+class UserCreateResponse(BaseModel):
     id: int
+    username: str
+    email: str
     created_at: datetime
 
     class Config:
         from_attributes = True
-        exclude = {"todolists"}  # Exclude the 'todolists' relationship
+        exclude = {"todolists"}
+
+class UserReadResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+        exclude = {"todolists"}
+
+class UserUpdateRequest(BaseModel):
+    username: Optional[str] = None
+    email: Optional[str] = None
+    password: Optional[str] = None
+
+class UserUpdateResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+        exclude = {"todolists"}
+
+class UserDeleteResponse(BaseModel):
+    detail: str
+
+class UserLoginRequest(BaseModel):
+    username: str
+    password: str
+
+class UserLoginResponse(TokenResponse):
+    pass

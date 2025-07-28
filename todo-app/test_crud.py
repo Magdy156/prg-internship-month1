@@ -255,8 +255,8 @@ def test_crud():
         response = requests.delete(f"{BASE_URL}/users/{created_user['id']}", headers=headers)
         print(f"Delete User - Status Code: {response.status_code}")
         print(f"Delete User - Response: {response.text}")
-        if response.status_code != 200:
-            print(f"Test failed: Delete User failed: {response.text}")
+        if response.status_code != 200 or response.json().get("detail") != "User deleted":
+            print(f"Test failed: Expected 200 with 'User deleted', got {response.status_code}: {response.text}")
             raise Exception("Delete User failed")
 
         print("All CRUD and exception tests passed successfully!")
